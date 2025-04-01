@@ -78,15 +78,6 @@ def main():
         print(f"{degrees} degrees of separation.")
         path = [(None, source)] + path
         for i in range(degrees):
-            # idx1 = path[i][1]
-            # idx2 = path[i+1][1]
-            # person1 = people[path[1][i]]["name"]
-            # person2 = people[path[1][i+1]]["name"]
-            # movie = movies[path[0][i + 1]]["title"]
-            # person1 = (people[idx1])["name"]
-            # person2 = (people[idx2])["name"]
-            # movie = (movies[idx2])["title"]
-
             person1 = people[path[i][1]]["name"]
             person2 = people[path[i+1][1]]["name"]
             movie = movies[path[i+1][0]]["title"]
@@ -114,6 +105,7 @@ def shortest_path(source, target):
     # Keep looping until solution found
     num_explored = 0
     explored = set()
+    all_solutions = []
     while True:
 
         # If nothing left in frontier, then no path
@@ -132,17 +124,18 @@ def shortest_path(source, target):
                 actions.append(node.action)
                 cells.append(node.state)
                 node = node.parent
-            # actions.append(None)
-            # cells.append(source)
-            # actions.reverse()
-            # cells.reverse()
-            # solution = (actions, cells)
 
             solution = []
             for i in range(len(actions)):
                 solution.append((actions[i], cells[i]))
 
-            return solution
+
+            PrintSolution(source,  solution, num_explored, explored)
+            all_solutions.append(solution)
+            solution.clear()
+            if(qfrontier.empty()): 
+                return solution
+            # return solution
 
         # Mark node as explored
         explored.add(node.state)
@@ -157,6 +150,7 @@ def shortest_path(source, target):
                 print("Added: ", child.state)
 
 
+    return solution
     # TODO
     # raise NotImplementedError
 
@@ -200,6 +194,30 @@ def neighbors_for_person(person_id):
             neighbors.add((movie_id, person_id))
     return neighbors
 
+def PrintSolution(source, path, num_explored, explored):
+    if path is None:
+        print("Not connected.")
+        return
+
+    print()
+    print(f"Solution:")
+    print(f"Number explored: {num_explored}")
+    print(f"Number of distinct nodes: {len(explored)}")
+    for name in explored:
+        print(f"{name}")
+    print()
+
+    degrees = len(path)
+    print(f"{degrees} degrees of separation.")
+    path = [(None, source)] + path
+    for i in range(degrees):
+        person1 = people[path[i][1]]["name"]
+        person2 = people[path[i+1][1]]["name"]
+        movie = movies[path[i+1][0]]["title"]
+        
+        print(f"{i + 1}: {person1} and {person2} starred in {movie}")
+
+    return
 
 
 if __name__ == "__main__":
