@@ -65,6 +65,7 @@ def main():
     source = person_id_for_name(input("Name: "))
     if source is None:
         sys.exit("Person not found.")
+
     target = person_id_for_name(input("Name: "))
     if target is None:
         sys.exit("Person not found.")
@@ -81,7 +82,7 @@ def main():
             person1 = people[path[i][1]]["name"]
             person2 = people[path[i+1][1]]["name"]
             movie = movies[path[i+1][0]]["title"]
-           
+        
             print(f"{i + 1}: {person1} and {person2} starred in {movie}")
 
 
@@ -105,7 +106,6 @@ def shortest_path(source, target):
     # Keep looping until solution found
     num_explored = 0
     explored = set()
-    all_solutions = []
     while True:
 
         # If nothing left in frontier, then no path
@@ -114,7 +114,7 @@ def shortest_path(source, target):
 
         # Choose a node from the frontier
         node = qfrontier.remove()
-        print("Removed: ", node.state)
+        # print("Removed: ", node.state)
         num_explored += 1
 
         if node.state == target:
@@ -129,30 +129,34 @@ def shortest_path(source, target):
             for i in range(len(actions)):
                 solution.append((actions[i], cells[i]))
 
+            print()
+            print(f"Solution:")
+            print(f"Number explored: {num_explored}")
+            # print(f"Number of distinct nodes: {len(explored)}")
+            # for name in explored:
+            #     print(f"{name}")
+            print()
 
-            PrintSolution(source,  solution, num_explored, explored)
-            all_solutions.append(solution)
-            solution.clear()
-            if(qfrontier.empty()): 
-                return solution
-            # return solution
+            return solution
 
         # Mark node as explored
         explored.add(node.state)
 
-        # neighbours is a list of tuples (movie_id, person_id)
+        # neighbours is a set of tuples (movie_id, person_id)
         neighbours = neighbors_for_person(node.state)
+        if len(neighbours) == 0:
+            print()
+            print(f"No neighbors for {node.state}")
         for movie, person in neighbours:
             if not qfrontier.contains_state(person) and person not in explored:
-                print(node.state, "      ", movie, "    ", person)
+                # print()
+                # print(f"{node.state}         {movie}       {person}")
                 child = Node(person, node, movie)
                 qfrontier.add(child)
-                print("Added: ", child.state)
+                # print(f"Added:    {child.state}")
 
 
-    return solution
-    # TODO
-    # raise NotImplementedError
+    return None
 
 
 def person_id_for_name(name):
@@ -194,30 +198,6 @@ def neighbors_for_person(person_id):
             neighbors.add((movie_id, person_id))
     return neighbors
 
-def PrintSolution(source, path, num_explored, explored):
-    if path is None:
-        print("Not connected.")
-        return
-
-    print()
-    print(f"Solution:")
-    print(f"Number explored: {num_explored}")
-    print(f"Number of distinct nodes: {len(explored)}")
-    for name in explored:
-        print(f"{name}")
-    print()
-
-    degrees = len(path)
-    print(f"{degrees} degrees of separation.")
-    path = [(None, source)] + path
-    for i in range(degrees):
-        person1 = people[path[i][1]]["name"]
-        person2 = people[path[i+1][1]]["name"]
-        movie = movies[path[i+1][0]]["title"]
-        
-        print(f"{i + 1}: {person1} and {person2} starred in {movie}")
-
-    return
 
 
 if __name__ == "__main__":
